@@ -1,5 +1,7 @@
 #include "hivemodel.h"
+#include <QApplication>
 #include <QDebug>
+#include <QStyle>
 #include <hivex.h>
 #include <errno.h>
 #include "nodeitem.h"
@@ -140,16 +142,26 @@ QVariant HiveModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !m_root)
         return QVariant();
 
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole && role != Qt::DecorationRole)
         return QVariant{};
 
     HiveItem *item = static_cast<HiveItem *>(index.internalPointer());
     if (!item)
     {
         qWarning() << "Could not load data for item";
-        return QString{"<INVALID>"};
+        return QVariant{};
     }
-    return item->name();
+
+    switch (role)
+    {
+    case Qt::DisplayRole:
+        return item->name();
+    case Qt::DecorationRole:
+        if (item->isNode())
+            return QApplication::style()->standardIcon(QStyle::SP_DirIcon);
+        return QVariant{};
+    }
+    return QVariant{};
 }
 
 Qt::ItemFlags HiveModel::flags(const QModelIndex &index) const
