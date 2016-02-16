@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include "hivemodel.h"
+#include "hiveview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -13,8 +14,15 @@ MainWindow::MainWindow(QWidget *parent) :
     m_hiveModel(nullptr)
 {
     ui->setupUi(this);
+    initConnections();
     initIcons();
     initShortcuts();
+}
+
+void MainWindow::initConnections()
+{
+    connect(ui->nodeView, &HiveView::activeHiveItemChanged,
+            this, &MainWindow::onNodeActivated);
 }
 
 void MainWindow::initIcons()
@@ -56,3 +64,19 @@ void MainWindow::on_actionOpen_Hive_triggered()
         }
     }
 }
+
+void MainWindow::onNodeActivated(HiveItem *item)
+{
+    QString name;
+    if (!item)
+    {
+        name = "<null>";
+    }
+    else
+    {
+        name = item->name();
+    }
+    // TODO: Connect to value model
+    qDebug() << "Selected Item:" << name;
+}
+

@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "hivemodel.h"
+#include "hiveitem.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,8 +19,10 @@ public:
 
 private slots:
     void on_actionOpen_Hive_triggered();
+    void onNodeActivated(HiveItem *item);
 
 private:
+    void initConnections();
     void initIcons();
     void initShortcuts();
 
