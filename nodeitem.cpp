@@ -7,7 +7,7 @@
 NodeItem::NodeItem(HiveItem *parent, int index, QString name,
                    hive_h *hive, hive_node_h node) :
     HiveItem(parent, index, name),
-    m_hive(hive), m_node(node), m_haveLoaded(false)
+    m_hive(hive), m_nodeHandle(node), m_haveLoaded(false)
 {
     qDebug() << "Created" << *this;
 }
@@ -22,7 +22,7 @@ NodeItem::~NodeItem()
 {
     QMutexLocker locker{&m_childrenMutex};
     qDeleteAll(m_children);
-    if (m_node == hivex_root(m_hive))
+    if (m_nodeHandle == hivex_root(m_hive))
     {
         qDebug() << "Closing Hive" << m_hive;
         hivex_close(m_hive);
@@ -43,7 +43,7 @@ HiveItem *NodeItem::childItem(int index)
 
 int NodeItem::childCount() const
 {
-    size_t numChildren = hivex_node_num_children(m_hive, m_node);
+    size_t numChildren = hivex_node_nr_children(m_hive, m_nodeHandle);
     // qDebug() << *this << "has" << numChildren << "children";
     return numChildren;
 }
@@ -66,7 +66,7 @@ void NodeItem::loadChildren()
     qDebug() << "Deleting current children";
     qDeleteAll(m_children);
 
-    hive_node_h *nodes = hivex_node_children(m_hive, m_node);
+    hive_node_h *nodes = hivex_node_children(m_hive, m_nodeHandle);
     if (!nodes)
     {
         qWarning() << "Could not load child nodes of" << *this;
@@ -122,6 +122,6 @@ QDebug operator<<(QDebug dbg, const NodeItem &node)
     Q_UNUSED(saver);
     dbg.nospace() << "NodeItem(name: " << node.name()
                             << ", hive: " << node.m_hive
-                            << ", node: " << node.m_node << ")";
+                            << ", node: " << node.m_nodeHandle << ")";
     return dbg;
 }

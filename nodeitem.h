@@ -26,7 +26,7 @@ private:
     static QString getNodeName(hive_h *hive, hive_node_h node);
 
     hive_h *m_hive;
-    hive_node_h m_node;
+    hive_node_h m_nodeHandle;
     bool m_haveLoaded;
     QList<NodeItem *> m_children;
 
