@@ -10,10 +10,14 @@ public:
     ValueItem(HiveItem *parent, int index, hive_h *hive, hive_value_h value);
 
     virtual int valueType();
-    virtual QString valueTypeString();
+    virtual QString valueTypeDisplay();
     virtual QByteArray rawData();
+    virtual bool isDefault() const;
+
     virtual bool isNode() const override;
-    virtual QVariant data();
+    virtual QVariant data() const override;
+    virtual QPair<QString, bool> dataDisplay() const override;
+
 
 private:
     void loadData();

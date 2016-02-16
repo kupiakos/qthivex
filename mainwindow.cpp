@@ -61,6 +61,7 @@ void MainWindow::on_actionOpen_Hive_triggered()
             if (m_hiveModel)
             {
                 ui->nodeView->setModel(nullptr);
+                m_hiveValuesModel.loadNode(nullptr);
                 delete m_hiveModel;
             }
             m_hiveModel = model;

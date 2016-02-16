@@ -12,6 +12,7 @@ enum ValueColumn
 HiveValuesModel::HiveValuesModel(QObject *parent)
     : QAbstractTableModel(parent)
 {
+    m_italicFont.setItalic(true);
 }
 
 int HiveValuesModel::rowCount(const QModelIndex &parent) const
@@ -54,27 +55,25 @@ QVariant HiveValuesModel::data(const QModelIndex &index, int role) const
         {
         case ValueColumn::Name:
         {
-            QString name = item->name();
-            // Default Value
-            if (name.isEmpty())
-            {
-                name = "(Default)";
-            }
-            return name;
+            if (item->isDefault())
+                return "(Default)";
+            return item->name();
         }
         case ValueColumn::Type:
-            return item->valueTypeString();
+            return item->valueTypeDisplay();
         case ValueColumn::Data:
-            return item->data();
+            return item->dataDisplay().first;
         }
         break;
 
     case Qt::FontRole:
-        if (index.column() == ValueColumn::Name && item->name().isEmpty())
+        if (index.column() == ValueColumn::Name && item->isDefault())
         {
-            QFont font{};
-            font.setItalic(true);
-            return font;
+            return m_italicFont;
+        }
+        if (index.column() == ValueColumn::Data && item->dataDisplay().second)
+        {
+            return m_italicFont;
         }
         break;
     }

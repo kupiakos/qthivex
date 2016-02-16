@@ -35,6 +35,11 @@ QVariant HiveItem::data() const
     return QVariant{};
 }
 
+QPair<QString, bool> HiveItem::dataDisplay() const
+{
+    return qMakePair(QString{""}, false);
+}
+
 int HiveItem::childCount() const
 {
     return 0;

@@ -1,5 +1,6 @@
 #include "valueitem.h"
 #include <QDebug>
+#include <QPair>
 
 ValueItem::ValueItem(HiveItem *parent, int index,
                      hive_h *hive, hive_value_h value) :
@@ -14,7 +15,7 @@ int ValueItem::valueType()
     return m_valueType;
 }
 
-QString ValueItem::valueTypeString()
+QString ValueItem::valueTypeDisplay()
 {
     switch (m_valueType)
     {
@@ -52,14 +53,77 @@ QByteArray ValueItem::rawData()
     return m_rawData;
 }
 
+bool ValueItem::isDefault() const
+{
+    return name().isEmpty();
+}
+
 bool ValueItem::isNode() const
 {
     return false;
 }
 
-QVariant ValueItem::data()
+QVariant ValueItem::data() const
 {
     return m_data;
+}
+
+QPair<QString, bool> ValueItem::dataDisplay() const
+{
+    QString str;
+    bool isSpecial = false;
+
+    switch (m_valueType)
+    {
+    case hive_t_REG_SZ:
+    case hive_t_REG_EXPAND_SZ:
+    case hive_t_REG_LINK:
+        str = m_data.toString();
+        if (str.isEmpty())
+        {
+            str = "(empty string)";
+            isSpecial = true;
+        }
+        break;
+
+    case hive_t_REG_MULTI_SZ:
+        str = m_data.toStringList().join(", ");
+        if (str.isEmpty())
+        {
+            str = "(empty string list)";
+            isSpecial = true;
+        }
+        break;
+
+    case hive_t_REG_DWORD:
+    case hive_t_REG_DWORD_BIG_ENDIAN:
+        str = m_data.toString();
+        if (m_rawData.length() != 4)
+        {
+            str = "(invalid DWORD value)";
+            isSpecial = true;
+        }
+        break;
+
+    case hive_t_REG_QWORD:
+        str = m_data.toString();
+        if (m_rawData.length() != 8)
+        {
+            str = "(invalid QWORD value)";
+            isSpecial = true;
+        }
+        break;
+
+    default:
+        str = m_rawData.toHex();
+        if (str.isEmpty())
+        {
+            str = "(empty binary data)";
+            isSpecial = true;
+        }
+        break;
+    }
+    return qMakePair(str, isSpecial);
 }
 
 void ValueItem::loadData()

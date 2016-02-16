@@ -2,6 +2,7 @@
 #define HIVEVALUESMODEL_H
 
 #include <QAbstractTableModel>
+#include <QFont>
 #include "valueitem.h"
 
 class HiveValuesModel : public QAbstractTableModel
@@ -23,6 +24,7 @@ public slots:
     virtual void loadNode(HiveItem *item);
 
 private:
+    QFont m_italicFont;
     QList<ValueItem *> m_values;
 };
 

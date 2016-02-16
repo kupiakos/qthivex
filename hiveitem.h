@@ -5,6 +5,7 @@
 #include <QString>
 #include <QList>
 #include <QVariant>
+#include <QPair>
 
 class HiveItem
 {
@@ -18,6 +19,9 @@ public:
     virtual int index() const;
     virtual QString name() const;
     virtual QVariant data() const;
+
+    // Display string & whether "special" or not
+    virtual QPair<QString, bool> dataDisplay() const;
 
     virtual int childCount() const;
     virtual bool hasChildren() const;
