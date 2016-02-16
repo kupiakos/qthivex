@@ -3,6 +3,7 @@
 
 #include <QMutex>
 #include <QString>
+#include <QList>
 #include <QVariant>
 
 class HiveItem
@@ -21,6 +22,7 @@ public:
     virtual int childCount() const;
     virtual bool hasChildren() const;
     virtual bool isNode() const = 0;
+    virtual QList<HiveItem *> getValues();
 
 protected:
     void updateIndex(int index);

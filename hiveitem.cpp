@@ -44,6 +44,11 @@ bool HiveItem::hasChildren() const
     return childCount() > 0;
 }
 
+QList<HiveItem *> HiveItem::getValues()
+{
+    return QList<HiveItem *>{};
+}
+
 void HiveItem::updateIndex(int index)
 {
     m_index = index;
