@@ -25,7 +25,7 @@ HiveModel *HiveModel::loadHive(char *hiveLocation)
     if (!root)
     {
         qCritical() << "Error code" << errno
-                   << "while finding root hive" << hiveLocation;
+                    << "while finding root hive" << hiveLocation;
     }
 
     HiveItem *rootItem = static_cast<HiveItem *>(

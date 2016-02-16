@@ -16,6 +16,7 @@ HiveItem *HiveItem::parentItem()
 
 HiveItem *HiveItem::childItem(int index)
 {
+    Q_UNUSED(index);
     return nullptr;
 }
 

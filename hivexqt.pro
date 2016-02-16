@@ -17,13 +17,17 @@ SOURCES += main.cpp\
     hivemodel.cpp \
     hiveitem.cpp \
     nodeitem.cpp \
-    hiveview.cpp
+    hiveview.cpp \
+    hivevaluesmodel.cpp \
+    valueitem.cpp
 
 HEADERS  += mainwindow.h \
     hivemodel.h \
     hiveitem.h \
     nodeitem.h \
-    hiveview.h
+    hiveview.h \
+    hivevaluesmodel.h \
+    valueitem.h
 
 FORMS    += mainwindow.ui
 

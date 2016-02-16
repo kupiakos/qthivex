@@ -23,8 +23,6 @@ public:
     virtual bool hasChildren() const;
     virtual bool isNode() const = 0;
     virtual QList<HiveItem *> getValues();
-
-protected:
     void updateIndex(int index);
 
 private:

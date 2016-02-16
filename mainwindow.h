@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "hivemodel.h"
 #include "hiveitem.h"
+#include "hivevaluesmodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +29,7 @@ private:
 
     Ui::MainWindow *ui;
     HiveModel *m_hiveModel;
+    HiveValuesModel m_hiveValuesModel;
 };
 
 #endif // MAINWINDOW_H

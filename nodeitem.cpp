@@ -3,11 +3,13 @@
 #include <QMutexLocker>
 #include <algorithm>
 #include <stdlib.h>
+#include "valueitem.h"
 
 NodeItem::NodeItem(HiveItem *parent, int index, QString name,
                    hive_h *hive, hive_node_h node) :
     HiveItem(parent, index, name),
-    m_hive(hive), m_nodeHandle(node), m_haveLoaded(false)
+    m_hive(hive), m_nodeHandle(node),
+    m_loadedChildren(false), m_loadedValues(false)
 {
     qDebug() << "Created" << *this;
 }
@@ -22,6 +24,7 @@ NodeItem::~NodeItem()
 {
     QMutexLocker locker{&m_childrenMutex};
     qDeleteAll(m_children);
+    qDeleteAll(m_values);
     if (m_nodeHandle == hivex_root(m_hive))
     {
         qDebug() << "Closing Hive" << m_hive;
@@ -53,14 +56,21 @@ bool NodeItem::isNode() const
     return true;
 }
 
+QList<HiveItem *> NodeItem::getValues()
+{
+    loadValues();
+    QMutexLocker locker{&m_valuesMutex};
+    return m_values;
+}
+
 void NodeItem::loadChildren()
 {
     QMutexLocker locker{&m_childrenMutex};
-
-    if (m_haveLoaded)
+    if (m_loadedChildren)
     {
         return;
     }
+
     qDebug() << "Loading children of" << *this;
 
     qDebug() << "Deleting current children";
@@ -81,7 +91,8 @@ void NodeItem::loadChildren()
         qDebug() << "Loading child node of index" << childIndex
                  << "hive " << m_hive << "node" << *childNode;
         m_children.append(new NodeItem{static_cast<HiveItem *>(this),
-                                       0, m_hive, *childNode});
+                                       childIndex, m_hive, *childNode});
+        ++childIndex;
     }
     free(nodes);
     nodes = nullptr;
@@ -95,11 +106,54 @@ void NodeItem::loadChildren()
     qDebug() << "Updating child indexes";
     childIndex = 0;
     for (const auto &child : m_children)
-    {
         child->updateIndex(childIndex++);
+
+    m_loadedChildren = true;
+}
+
+void NodeItem::loadValues()
+{
+    QMutexLocker locker{&m_childrenMutex};
+    if (m_loadedValues)
+    {
+        return;
     }
 
-    m_haveLoaded = true;
+    qDebug() << "Loading values of" << *this;
+    qDebug() << "Deleting current values";
+    qDeleteAll(m_values);
+
+    hive_value_h *values = hivex_node_values(m_hive, m_nodeHandle);
+    if (!values)
+    {
+        qWarning() << "Could not load values of" << *this;
+        return;
+    }
+
+    int index = 0;
+    for (hive_value_h *value = values; *value; ++value)
+    {
+        qDebug() << "Loading value of index" << index
+                 << "hive" << m_hive << "value" << *value;
+        m_values.append(static_cast<HiveItem *>(
+                            new ValueItem(this, index, m_hive, *value)));
+        ++index;
+    }
+    free(values);
+    values = nullptr;
+
+    qDebug() << "Sorting values";
+    std::stable_sort(m_values.begin(), m_values.end(),
+                [](HiveItem * const &a, HiveItem * const &b) {
+        return (a && b) ? QString::compare(a->name(), b->name(), Qt::CaseInsensitive) < 0 : false;
+    });
+
+    qDebug() << "Updating value indexes";
+    index = 0;
+    for (const auto &value : m_values)
+        value->updateIndex(index++);
+
+    m_loadedValues = true;
 }
 
 QString NodeItem::getNodeName(hive_h *hive, hive_node_h node)

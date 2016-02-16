@@ -5,15 +5,17 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDir>
+#include <QDebug>
 #include "hivemodel.h"
 #include "hiveview.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_hiveModel(nullptr)
+    m_hiveModel(nullptr), m_hiveValuesModel(nullptr)
 {
     ui->setupUi(this);
+    ui->valueView->setModel(&m_hiveValuesModel);
     initConnections();
     initIcons();
     initShortcuts();
@@ -23,6 +25,8 @@ void MainWindow::initConnections()
 {
     connect(ui->nodeView, &HiveView::activeHiveItemChanged,
             this, &MainWindow::onNodeActivated);
+    connect(ui->nodeView, &HiveView::activeHiveItemChanged,
+            &m_hiveValuesModel, &HiveValuesModel::loadNode);
 }
 
 void MainWindow::initIcons()
