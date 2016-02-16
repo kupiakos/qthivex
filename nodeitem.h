@@ -15,10 +15,10 @@ public:
              hive_h *hive, hive_node_h node);
     virtual ~NodeItem();
 
-    virtual HiveItem *childItem(int index);
+    virtual HiveItem *childItem(int index) override;
 
-    virtual int childCount() const;
-    virtual bool isNode() const;
+    virtual int childCount() const override;
+    virtual bool isNode() const override;
 
 private:
     void loadChildren();
